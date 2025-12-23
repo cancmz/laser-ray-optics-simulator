@@ -55,12 +55,17 @@ def plot_energy_loss(ray):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-    
-air = OpticalMedium("Air", refractive_index=1.0, absorption_coeff=0.02)
-ray = Ray(origin=(0, 0), direction=(1, 0.3), energy=1.0)
 
-for _ in range(5):
-    ray.propagate(air, distance=10)
+def refract_ray(incident_direction, normal, n1, n2):
 
-plot_ray_path(ray)
-plot_energy_loss(ray)
+    incident = incident_direction / np.linalg.norm(incident_direction)
+    normal = normal / np.linalg.norm(normal)
+    cos_theta_i = -np.dot(incident, normal)
+    sin2_theta_t = (n1 / n2)**2 * (1 - cos_theta_i**2)
+
+    if sin2_theta_t > 1:
+        return None
+
+    cos_theta_t = np.sqrt(1 - sin2_theta_t)
+    refracted = (n1 / n2) * incident + ( (n1 / n2) * cos_theta_i - cos_theta_t ) * normal
+    return refracted / np.linalg.norm(refracted)
